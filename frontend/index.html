@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Desk-O-Tron 2000</title>
+    <link rel="stylesheet" href="main.css">
+    <link rel="icon"
+          href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🪑</text></svg>">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
+    </style>
+</head>
+
+<body class="container" id="shopping-list">
+<div class="row header">
+    <div class="col">
+        <h1>
+            <span class="letterbox">D</span>
+            <span class="letterbox">e</span>
+            <span class="letterbox">s</span>
+            <span class="letterbox">k</span>
+            <span class="letterbox">-</span>
+            <span class="letterbox">O</span>
+            <span class="letterbox">-</span>
+            <span class="letterbox">T</span>
+            <span class="letterbox">r</span>
+            <span class="letterbox">o</span>
+            <span class="letterbox">n</span>
+            <span class="letterbox">&nbsp;</span>
+            <span class="letterbox">2</span>
+            <span class="letterbox">0</span>
+            <span class="letterbox">0</span>
+            <span class="letterbox">0</span>
+        </h1>
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        <svg id="progress-bar" height="100%" width="100%">
+            <g class="progress-container">
+                <line class="progress-line-background" x1="0" x2="100%" y1="50%" y2="50%" stroke-width="30"/>
+                <line class="progress-line" x1="0" :x2="heightPercent + '%'" y1="50%" y2="50%" stroke-width="30"/>
+                <text class="percentage" x="50%" y="50%" dominant-baseline="middle"
+                      text-anchor="middle">{{round(heightPercent)}} % / {{Math.trunc(round(height) / 10)}} cm
+                </text>
+            </g>
+        </svg>
+        <a v-if="standingSince">Standing since {{ new Date(standingSince).toLocaleTimeString() }}</a>
+        <a v-if="sittingSince">Sitting since {{ new Date(sittingSince).toLocaleTimeString() }}</a>
+    </div>
+</div>
+
+<!-- Sit and Stand Values -->
+<div class="row">
+    <div class="col-50">
+        <label>Sit Height
+            <input type="number" v-model.number="sitHeight" step="0.01">
+        </label>
+        <button @click="sitHeight = round(height)">Current</button>
+    </div>
+    <div class="col-50">
+        <label>Duration
+            <input type="number" v-model.number="sitDuration" step="1">
+        </label>
+    </div>
+    <div class="col-50">
+        <label>Stand Height
+            <input type="number" v-model.number="standHeight" step="0.01">
+        </label>
+        <button @click="standHeight = round(height)">Current</button>
+    </div>
+    <div class="col-50">
+        <label>Duration
+            <input type="number" v-model.number="standDuration" step="1">
+        </label>
+    </div>
+</div>
+<!-- Controls  -->
+<div class="row row-center">
+    <div class="col-25">
+        <div class="button" @mousedown="start('fullUp')" @mouseleave="stop('fullUp')" @mouseup="stop('fullUp')"
+             @touchstart="start('fullUp')" @touchend="stop('fullUp')" @touchcancel="stop('fullUp')">
+            <div>
+                <svg width='100%' height='100%' viewBox="0 0 100 100" preserveAspectRatio="xMinYMin">
+                    <polygon points="0,100 100,100 50,50"/>
+                    <polygon points="0,70 100,70 50,0"/>
+                </svg>
+            </div>
+        </div>
+    </div>
+    <div class="col-25">
+        <div class="button" @mousedown="start('up')" @mouseleave="stop('up')" @mouseup="stop('up')"
+             @touchstart="start('up')" @touchend="stop('up')" @touchcancel="stop('up')">
+            <svg width='100%' height='100%' viewBox="0 0 100 100" preserveAspectRatio="xMinYMin">
+                <polygon points="50,0 0,100 100,100"/>
+            </svg>
+        </div>
+    </div>
+    <div class="col-25">
+        <div class="button" @mousedown="start('down')" @mouseleave="stop('down')" @mouseup="stop('down')"
+             @touchstart="start('down')" @touchend="stop('down')" @touchcancel="stop('down')">
+            <div>
+                <svg width='100%' height='100%' viewBox="0 0 100 100" preserveAspectRatio="xMinYMin">
+                    <polygon points="50,100 100,0 0,0"/>
+                </svg>
+            </div>
+        </div>
+    </div>
+    <div class="col-25">
+        <div class="button" @mousedown="start('fullDown')" @mouseleave="stop('fullDown')"
+             @mouseup="stop('fullDown')" @touchstart="start('fullDown')" @touchend="stop('fullDown')"
+             @touchcancel="stop('fullDown')">
+            <div>
+                <svg width='100%' height='100%' viewBox="0 0 100 100" preserveAspectRatio="xMinYMin">
+                    <!-- <polygon points="50,50 100,0 0,0" /> -->
+                    <polygon points="0,0 100,0, 50,50"/>
+                    <polygon points="0,30 100,30 50,100"/>
+                </svg>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="https://unpkg.com/vue@3"></script>
+<script>
+    const app = Vue.createApp({
+        watch: {
+            sitHeight: function (newValue, oldValue) {
+                if (oldValue != null) {
+                    command = {"command": "set_sit", "value": newValue - 620.0}
+                    this._connection.send(JSON.stringify(command))
+                }
+            },
+            standHeight: function (newValue, oldValue) {
+                if (oldValue != null) {
+                    command = {"command": "set_stand", "value": newValue - 620.0}
+                    this._connection.send(JSON.stringify(command))
+                }
+            },
+            standDuration: function (newValue, oldValue) {
+                if (oldValue != null) {
+                    command = {"command": "set_stand_duration", "value": newValue}
+                    this._connection.send(JSON.stringify(command))
+                }
+            },
+            sitDuration: function (newValue, oldValue) {
+                if (oldValue != null) {
+                    command = {"command": "set_sit_duration", "value": newValue}
+                    this._connection.send(JSON.stringify(command))
+                }
+            }
+        },
+        methods: {
+            sit() {
+                command = {"command": "sit"}
+                this._connection.send(JSON.stringify(command))
+            },
+            stand() {
+                command = {"command": "stand"}
+                this._connection.send(JSON.stringify(command))
+
+            },
+            handle_message(message) {
+                if ("current_height" in message) {
+                    // The current height is "machine height".
+                    // It goes from 0 to 650.
+                    // The "human" height is offset with 620mm.
+                    this.height = parseFloat(message['current_height']) + 620.0;
+                    return
+                }
+                if ('config' in message) {
+                    console.log(message)
+                    this.sitHeight = message.config.sit + 620.0
+                    this.standHeight = message.config.stand + 620.0
+                    this.sitDuration = message.config.sit_duration
+                    this.standDuration = message.config.stand_duration
+                } else {
+                    console.log("Message not understood:" + JSON.stringify(message))
+                }
+            },
+            start(e) {
+                if (e === 'fullDown') {
+                    this.sit()
+                }
+                if (e === 'fullUp') {
+                    this.stand()
+                }
+                if (e === "up" || e === "down") {
+                    if (!this._clicking) {
+                        let command = {"command": e === "up" ? "move_up" : "move_down"}
+                        this._connection.send(JSON.stringify(command));
+                        this._clicking = setInterval(() => {
+                            let command = {"command": e === "up" ? "move_up" : "move_down"}
+                            this._connection.send(JSON.stringify(command));
+                        }, 100);
+                    }
+                }
+            },
+            stop() {
+                clearInterval(this._clicking)
+                this._clicking = false;
+            },
+            round(n) {
+                return Math.trunc(n * 100) / 100;
+            }
+        },
+        data() {
+            return {
+                height: null,
+                sitHeight: null,
+                standHeight: null,
+                standDuration: null,
+                sitDuration: null,
+                _clicking: false,
+                _maxHeight: 1270,
+                _minHeight: 620,
+                _connection: null,
+                standingSince: null,
+                sittingSince: null
+            }
+        },
+        computed: {
+            heightPercent: function () {
+                let percent = (this.height - this._minHeight) / (this._maxHeight - this._minHeight) * 100;
+                console.log(percent)
+                return Math.trunc(percent * 100) / 100;
+            }
+        },
+        mounted: function () {
+            // Connect to the webserver when the webapp launches.
+            this._connection = new WebSocket('ws://trappist.localdomain:8000')
+
+            // Dispatch each incoming message to the handle_message functin.
+            this._connection.onmessage = (event) => {
+                this.handle_message(JSON.parse(event.data));
+            }
+
+            // When the connection is established, send a ping.
+            this._connection.onopen = (event) => {
+                this._connection.send(JSON.stringify({"command": "current_height"}));
+                this._connection.send(JSON.stringify({"command": "get_config"}));
+            }
+        }
+    })
+
+    app.mount('#shopping-list')
+</script>
+</body>
+
+</html>
