@@ -1,0 +1,7 @@
+hostname: localhost
+http_port: 8080
+mac: E7:D2:6F:3E:C6:84
+sit: 203.9
+sit_duration: 20
+stand: 631.6
+stand_duration: 40
