@@ -136,7 +136,12 @@ class Desk:
     async def __reconnect(self):
         self.__desk_connection = BleakClient(self.mac_address)
         try:
-            await self.__desk_connection.connect()
+            connected = False
+            while not connected:
+                print("Attempting reconnect..")
+                await self.__desk_connection.connect()
+                await asyncio.sleep(5)
+
             await self.__initialize_monitor()
             await self.get_desk_height()
         except Exception as e:
