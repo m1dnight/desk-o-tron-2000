@@ -186,7 +186,8 @@ class Desk:
 
     async def __install_debug_callback(self):
         def _cb(height, speed):
-            print("Height: {}, speed: {}".format(height, speed))
+            if speed != 0:
+                print("Height: {}, speed: {}".format(height, speed))
 
         self.install_callback(self.uuid_height, _cb)
 
