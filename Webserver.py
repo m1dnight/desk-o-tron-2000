@@ -10,7 +10,9 @@ class DeskSocketHandler(WebSocketHandler):
     connections = set()
     
     def check_origin(self, origin):
-        origin == hostname
+        print(origin)
+        print(self.hostname)
+        origin == self.hostname
 
     def initialize(self, callback, hostname):
         self.this = self
