@@ -6,18 +6,20 @@ from tornado.websocket import WebSocketHandler
 class DeskSocketHandler(WebSocketHandler):
     callback = None
     hostname = None
+    port = None
     this = None
     connections = set()
     
     def check_origin(self, origin):
-        print(origin)
-        print(self.hostname)
-        origin == self.hostname
+        allowed_origin == "http://{}:{}".format(self.hostname, self.port)
+        
+        origin == allowed_origin
 
-    def initialize(self, callback, hostname):
+    def initialize(self, callback, hostname, port):
         self.this = self
         self.callback = callback
         self.hostname = hostname
+        self.port = port 
 
     def on_close(self):
         self.connections.remove(self)
@@ -50,7 +52,7 @@ def generate_dashboard(hostname, port):
 async def start_webserver(hostname, port, callback):
     generate_dashboard(hostname, port)
     static_handler = (r"/(.*)", StaticFileHandler, {"path": "frontend/", "default_filename": "index.html"})
-    socket_handler = (r"/websocket", DeskSocketHandler, dict(callback=callback, hostname=hostname))
+    socket_handler = (r"/websocket", DeskSocketHandler, dict(callback=callback, hostname=hostname, port=port))
 
     app = Application(handlers=[socket_handler, static_handler])
     http_server = HTTPServer(app)
