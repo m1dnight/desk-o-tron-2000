@@ -12,10 +12,7 @@ class DeskSocketHandler(WebSocketHandler):
     
     def check_origin(self, origin):
         allowed_origin = "http://{}:{}".format(self.hostname, self.port)
-        print(allowed_origin)
-        print(origin)
-        print(origin == allowed_origin)
-        origin == allowed_origin
+        return origin == allowed_origin
 
     def initialize(self, callback, hostname, port):
         self.this = self
