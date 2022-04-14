@@ -14,6 +14,7 @@ class DeskSocketHandler(WebSocketHandler):
         allowed_origin = "http://{}:{}".format(self.hostname, self.port)
         print(allowed_origin)
         print(origin)
+        print(origin == allowed_origin)
         origin == allowed_origin
 
     def initialize(self, callback, hostname, port):
