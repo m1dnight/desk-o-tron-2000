@@ -136,8 +136,7 @@ class Desk:
     async def __reconnect(self):
         self.__desk_connection = BleakClient(self.mac_address)
         try:
-            connected = False
-            while not connected:
+            while not self.__desk_connection.is_connected:
                 print("Attempting reconnect..")
                 await self.__desk_connection.connect()
                 await asyncio.sleep(5)
