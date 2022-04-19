@@ -146,6 +146,7 @@ class Desk:
             while not self.__desk_connection.is_connected:
                 print("Attempting reconnect..")
                 if await self.__attempt_connect():
+                    print("Connection established")
                     return True
                 else:
                     print("Attempt to connect failed, waiting for 30 seconds..")
