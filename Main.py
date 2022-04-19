@@ -9,6 +9,7 @@ from Timer import Timer
 
 def socket_to_desk(desk, cfg, timer):
     async def _handle_message(msg_json):
+        print("Handling message {}".format(msg_json))
         command = msg_json["command"]
         if command == "move_up":
             asyncio.create_task(desk.move_up())
@@ -73,6 +74,7 @@ async def schedule_stand_task(desk, config, timer):
         asyncio.create_task(_move_and_schedule_next())
 
     await timer.task_after_n_seconds(config.stand_duration() * 60, desk_stand_task, "stand_task")
+
 
 async def schedule_sit_task(desk, config, timer):
     async def _move_and_schedule_next():
