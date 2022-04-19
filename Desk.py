@@ -212,6 +212,7 @@ class Desk:
         except Exception as e:
             print("An error occurred connecting to the desk: {}".format(e))
             return False
+        print("Connected to desk!")
 
     async def connect_to_desk(self) -> Any:
         await self.__initialize()
