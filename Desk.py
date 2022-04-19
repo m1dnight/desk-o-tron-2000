@@ -148,6 +148,7 @@ class Desk:
                 if await self.__attempt_connect():
                     return True
                 else:
+                    print("Attempt to connect failed, waiting for 30 seconds..")
                     await asyncio.sleep(30)
 
             await self.__initialize_monitor()
