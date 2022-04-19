@@ -227,9 +227,9 @@ class Desk:
             await self.__initialize_monitor()
             await self.__initialize_callbacks()
         except Exception as e:
-            print("An error occurred connecting to the desk: {}".format(e))
+            logging.error("An error occurred connecting to the desk: {}".format(e))
             return False
-        print("Connected to desk!")
+        logging.debug("Connected to desk!")
 
     async def connect_to_desk(self) -> Any:
         await self.__initialize()
