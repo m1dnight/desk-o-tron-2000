@@ -67,6 +67,7 @@ def sit_task(desk, config):
 
 async def schedule_stand_task(desk, config, timer):
     async def _move_and_schedule_next():
+        print("Moving desk to stand position")
         await desk.move_to(config.stand())
         await schedule_sit_task(desk, config, timer)
 
@@ -78,6 +79,7 @@ async def schedule_stand_task(desk, config, timer):
 
 async def schedule_sit_task(desk, config, timer):
     async def _move_and_schedule_next():
+        print("Moving desk to sit position")
         await desk.move_to(config.sit())
         await schedule_stand_task(desk, config, timer)
 
