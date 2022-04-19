@@ -129,11 +129,6 @@ class Desk:
                     logging.debug("Desk stopped moving, but did not reach target.")
                     asyncio.create_task(self.remove_callback(self.uuid_height, _move))
                     move_completed.set_result(True)
-                else:
-                    logging.debug("Desk stopped moving, trying again!")
-                    await asyncio.sleep(2)
-                    retries = retries + 1
-                    asyncio.create_task(self.move_down())
 
             elif update_counter % 6 == 0:
                 if direction == self.cmd_up:
@@ -142,6 +137,7 @@ class Desk:
                     asyncio.create_task(self.move_down())
 
         self.install_callback(self.uuid_height, _move)
+
         if direction == self.cmd_up:
             asyncio.create_task(self.move_up())
         else:
