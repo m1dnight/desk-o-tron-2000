@@ -6,8 +6,10 @@ from typing import Any
 
 from bleak import BleakClient, BleakError  # type: ignore
 
-logging.basicConfig(format='%(asctime)s %(message)s', encoding='utf-8', level=logging.DEBUG)
-logging.getLogger().addHandler(logging.FileHandler(r'idasen.log'))
+logging.basicConfig(format='%(asctime)s %(message)s', encoding='utf-8')
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+logger.addHandler(logging.FileHandler(r'idasen.log'))
 
 
 class ConnectException(Exception):
