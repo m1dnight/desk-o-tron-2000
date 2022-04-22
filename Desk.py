@@ -3,7 +3,7 @@ import struct
 from asyncio import Task
 from typing import Any, Callable, Union
 import logging
-import bleak.exc
+import bleak
 from bleak import BleakClient
 
 
