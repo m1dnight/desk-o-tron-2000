@@ -1,5 +1,5 @@
 import asyncio
-import logging
+import datetime
 import os
 import struct
 from typing import Any
@@ -9,6 +9,10 @@ from bleak import BleakClient, BleakError  # type: ignore
 
 class ConnectException(Exception):
     pass
+
+
+def log(message):
+    print("{} {}".format(datetime.datetime.now(), message))
 
 
 class Idasen:
@@ -47,7 +51,7 @@ class Idasen:
                 return connection
             except ConnectException:
                 remaining_attempts = -1 if attempts_left == -1 else attempts_left - 1
-                print("Attempt to connect to desk failed. Trying {} more times in {} seconds.".format(remaining_attempts, backoff))
+                log("Attempt to connect to desk failed. Trying {} more times in {} seconds.".format(remaining_attempts, backoff))
                 await asyncio.sleep(backoff)
                 await self.attempt_connect_n_times(remaining_attempts, backoff)
         else:
@@ -59,13 +63,13 @@ class Idasen:
         If a connection is established, a new waiter is created so this one can terminate.
         :param disconnect_event:
         """
-        print("Reconnect waiter waiting for disconnect event.")
+        log("Reconnect waiter waiting for disconnect event.")
         await disconnect_event.wait()
         try:
             self.connection = await self.attempt_connect_n_times(-1, 30)
-            print("Reconnect waiter successfully reconnected to the desk.")
+            log("Reconnect waiter successfully reconnected to the desk.")
         except ConnectException as e:
-            print("Reconnect waiter could not connect to desk after {} attempts.".format(-1))
+            log("Reconnect waiter could not connect to desk after {} attempts.".format(-1))
             raise ConnectException("Reconnect waiter could not find and connect to desk. Ensure the MAC address is correct and the desk is powered on.")
 
     async def attempt_connect(self) -> BleakClient:
@@ -73,8 +77,7 @@ class Idasen:
         Attempts to connect to the desk once. Throws an exception if the connection fails.
         :return: the connection.
         """
-        print("Attempting to connect to desk.")
-        print("PRoberen proberen")
+        log("Attempting to connect to desk.")
 
         disconnected_event = asyncio.Event()
 
@@ -84,12 +87,12 @@ class Idasen:
         try:
             connection = BleakClient(self.mac_address, disconnected_callback=disconnected_callback)
             await connection.connect()
-            print("Connection attempt succeeded.")
+            log("Connection attempt succeeded.")
             asyncio.create_task(self.reconnect_waiter(disconnected_event))
             return connection
 
         except BleakError as e:
-            print("Connection attempt failed.")
+            log("Connection attempt failed.")
             raise ConnectException("Could not connect to desk.")
 
     async def connect(self) -> None:
@@ -99,9 +102,9 @@ class Idasen:
         attempts = 2
         try:
             self.connection = await self.attempt_connect_n_times(attempts, 30)
-            print("Successfully connected to the desk.")
+            log("Successfully connected to the desk.")
         except ConnectException as e:
-            print("Could not connect to desk after {} attempts.".format(attempts))
+            log("Could not connect to desk after {} attempts.".format(attempts))
             raise ConnectException(
                 "Could not find and connect to desk. Ensure the MAC address is correct and the desk is powered on.")
 
@@ -110,7 +113,7 @@ mac = 'E7:D2:6F:3E:C6:84'
 
 
 async def main():
-    print("Test")
+    log("Test")
     idasen = Idasen(mac)
     await idasen.connect()
 
