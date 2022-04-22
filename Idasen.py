@@ -68,7 +68,7 @@ class Idasen:
         await disconnect_event.wait()
         try:
             self.connection = await self.attempt_connect_n_times(-1, 30)
-            logging.info("Reconnect waiter successfully reconnected to the desk.")
+            logging.debug("Reconnect waiter successfully reconnected to the desk.")
         except ConnectException as e:
             logging.error("Reconnect waiter could not connect to desk after {} attempts.".format(-1))
             raise ConnectException("Reconnect waiter could not find and connect to desk. Ensure the MAC address is correct and the desk is powered on.")
@@ -88,7 +88,7 @@ class Idasen:
         try:
             connection = BleakClient(self.mac_address, disconnected_callback=disconnected_callback)
             await connection.connect()
-            logging.info("Connection attempt succeeded.")
+            logging.debug("Connection attempt succeeded.")
             asyncio.create_task(self.reconnect_waiter(disconnected_event))
             return connection
 
@@ -103,7 +103,7 @@ class Idasen:
         attempts = 2
         try:
             self.connection = await self.attempt_connect_n_times(attempts, 30)
-            logging.info("Successfully connected to the desk.")
+            logging.debug("Successfully connected to the desk.")
         except ConnectException as e:
             logging.error("Could not connect to desk after {} attempts.".format(attempts))
             raise ConnectException(
