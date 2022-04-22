@@ -79,6 +79,7 @@ class Idasen:
         :return: the connection.
         """
         logging.debug("Attempting to connect to desk.")
+        print("PRoberen proberen")
 
         disconnected_event = asyncio.Event()
 
