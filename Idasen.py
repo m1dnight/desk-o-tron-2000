@@ -53,7 +53,7 @@ class Idasen:
                 remaining_attempts = -1 if attempts_left == -1 else attempts_left - 1
                 log("Attempt to connect to desk failed. Trying {} more times in {} seconds.".format(remaining_attempts, backoff))
                 await asyncio.sleep(backoff)
-                await self.attempt_connect_n_times(remaining_attempts, backoff)
+                asyncio.create_task(self.attempt_connect_n_times(remaining_attempts, backoff))
         else:
             raise ConnectException("No attempts succeeded to connect to the desk.")
 
